@@ -17,7 +17,7 @@ def hello_world():
     return "Hello {}!".format(name)
 
 @app.route('/delta', methods=['POST'])
-def delta():
+def get_delta():
     origin = request.form['origin'].upper()
     destination = request.form['destination'].upper()
     date = request.form['date']
@@ -32,7 +32,7 @@ def delta():
         return jsonify(deltaFlights)
 
 @app.route('/united', methods=['POST'])
-def united():
+def get_united():
     origin = request.form['origin'].upper()
     destination = request.form['destination'].upper()
     date = request.form['date']
@@ -47,7 +47,7 @@ def united():
         return jsonify(unitedFlights)
 
 @app.route('/chase', methods=['POST'])
-def chase():
+def get_chase():
     origin = request.form['origin'].upper()
     destination = request.form['destination'].upper()
     date = request.form['date']
@@ -62,7 +62,7 @@ def chase():
         return jsonify(chaseFlights)
 
 @app.route('/southwest', methods=['POST'])
-def southwest():
+def get_southwest():
     origin = request.form['origin'].upper()
     destination = request.form['destination'].upper()
     date = request.form['date']
