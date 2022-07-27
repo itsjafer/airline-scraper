@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+node_modules/
+/test-results/
+/playwright-report/
+/playwright/.cache/
