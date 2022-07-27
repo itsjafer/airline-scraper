@@ -81,27 +81,27 @@ def standardize_results(trip):
     return results
 
 def get_flights(origin, destination, date):
-    playwright = sync_playwright().start()
-    browser = playwright.chromium.launch(
-            headless=True
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(
+                headless=True
+            )
+        page = browser.new_page(
+            user_agent=USER_AGENT,
+            viewport=VIEWPORT
         )
-    page = browser.new_page(
-        user_agent=USER_AGENT,
-        viewport=VIEWPORT
-    )
 
-    url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
+        url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
 
-    flights = list()
-    with page.expect_response("https://www.united.com/api/flight/FetchFlights") as response_info:
-        page.goto(url)
-        rawResponse = response_info.value.json()
-        if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
-            trips = rawResponse['data']['Trips']
-            flights = standardize_results(trips[0])
-    page.close()
-    browser.close()
-    playwright.stop()
+        flights = list()
+        with page.expect_response("https://www.united.com/api/flight/FetchFlights", timeout=60000) as response_info:
+            page.goto(url)
+            rawResponse = response_info.value.json()
+            if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
+                trips = rawResponse['data']['Trips']
+                flights = standardize_results(trips[0])
+        page.close()
+        browser.close()
+        playwright.stop()
 
-    return flights
+        return flights
             

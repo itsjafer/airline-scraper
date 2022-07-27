@@ -57,61 +57,61 @@ def standardize_results(raw):
     return results   
 
 def get_flights(origin, destination, date):
-    playwright = sync_playwright().start()
-    browser = playwright.chromium.launch(
-            headless=True
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(
+                headless=True
+            )
+        page = browser.new_page(
+            user_agent=USER_AGENT,
+            viewport=VIEWPORT
         )
-    page = browser.new_page(
-        user_agent=USER_AGENT,
-        viewport=VIEWPORT
-    )
 
-    stealth_sync(page)
+        stealth_sync(page)
 
-    page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="networkidle")
+        page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="networkidle")
 
-    formatted_date = f'{date[5:7]}/{date[8:10]}/{date[0:4]}'
+        formatted_date = f'{date[5:7]}/{date[8:10]}/{date[0:4]}'
 
-    # Fill in values
-    page.locator("#fromAirportName span.airport-code.d-block").click()
-    page.locator("#search_input").fill(origin)
-    page.locator(".airportLookup-list .airport-code").first.click()
+        # Fill in values
+        page.locator("#fromAirportName span.airport-code.d-block").click()
+        page.locator("#search_input").fill(origin)
+        page.locator(".airportLookup-list .airport-code").first.click()
 
-    page.locator("#toAirportName span.airport-code.d-block").click()
-    page.locator("#search_input").fill(destination)
-    page.locator(".airportLookup-list .airport-code").first.click()
+        page.locator("#toAirportName span.airport-code.d-block").click()
+        page.locator("#search_input").fill(destination)
+        page.locator(".airportLookup-list .airport-code").first.click()
 
-    page.locator("select[name='selectTripType']").select_option("ONE_WAY")
+        page.locator("select[name='selectTripType']").select_option("ONE_WAY")
 
-    page.locator("#calDepartLabelCont").click()
-    page.wait_for_selector(".dl-datepicker-calendar")
+        page.locator("#calDepartLabelCont").click()
+        page.wait_for_selector(".dl-datepicker-calendar")
 
-    tries = 0
-    while True:
-        if tries == 9:
-            return []
-        tries += 1
-        if not page.is_visible(f"a[data-date^='{formatted_date}']"):
-            page.locator("a[aria-label='Next']:not([class*='no-next'])").click()
-            continue
-        page.locator(f"a[data-date^='{formatted_date}']", ).click()
-        break
+        tries = 0
+        while True:
+            if tries == 9:
+                return []
+            tries += 1
+            if not page.is_visible(f"a[data-date^='{formatted_date}']"):
+                page.locator("a[aria-label='Next']:not([class*='no-next'])").click()
+                continue
+            page.locator(f"a[data-date^='{formatted_date}']", ).click()
+            break
 
-    page.locator("button.donebutton").click()
-    page.wait_for_selector(f"div[class*='calDispValueCont']:not([class*='open'])")
+        page.locator("button.donebutton").click()
+        page.wait_for_selector(f"div[class*='calDispValueCont']:not([class*='open'])")
 
-    page.locator("#shopWithMiles").click(force=True)
-    page.locator("#chkFlexDate").evaluate("node => node.removeAttribute('disabled')")
-    page.locator("#chkFlexDate").uncheck(force=True)
+        page.locator("#shopWithMiles").click(force=True)
+        page.locator("#chkFlexDate").evaluate("node => node.removeAttribute('disabled')")
+        page.locator("#chkFlexDate").uncheck(force=True)
 
 
-    flights = list()
-    with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
-        page.locator("#btnSubmit").click()
-        rawResponse = response_info.value.json()
-        flights = standardize_results(rawResponse)
-    page.close()
-    browser.close()
-    playwright.stop()
+        flights = list()
+        with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
+            page.locator("#btnSubmit").click()
+            rawResponse = response_info.value.json()
+            flights = standardize_results(rawResponse)
+        page.close()
+        browser.close()
+        playwright.stop()
 
-    return flights
+        return flights
