@@ -1,6 +1,8 @@
 import json
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
+from playwright.helper import TimeoutError
+import time
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
 def standardize_results(trip):
@@ -93,12 +95,22 @@ def get_flights(origin, destination, date):
         url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
 
         flights = list()
-        with page.expect_response("https://www.united.com/api/flight/FetchFlights", timeout=60000) as response_info:
-            page.goto(url)
-            rawResponse = response_info.value.json()
-            if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
-                trips = rawResponse['data']['Trips']
-                flights = standardize_results(trips[0])
+        tries = 0
+        while True:
+            if tries == 2:
+                return []
+            try:
+                with page.expect_response("https://www.united.com/api/flight/FetchFlights", timeout=20000) as response_info:
+                    page.goto(url)
+                    rawResponse = response_info.value.json()
+                    if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
+                        trips = rawResponse['data']['Trips']
+                        flights = standardize_results(trips[0])
+                        break
+            except TimeoutError:
+                tries += 1
+                time.sleep(5)
+
         page.close()
         browser.close()
 
