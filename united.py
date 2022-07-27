@@ -1,7 +1,6 @@
 import json
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
-from playwright.helper import TimeoutError
 import time
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
@@ -107,7 +106,7 @@ def get_flights(origin, destination, date):
                         trips = rawResponse['data']['Trips']
                         flights = standardize_results(trips[0])
                         break
-            except TimeoutError:
+            except PlaywrightTimeoutError:
                 tries += 1
                 time.sleep(5)
 
