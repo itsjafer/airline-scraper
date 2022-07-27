@@ -1,6 +1,5 @@
 import json
 from playwright.sync_api import sync_playwright
-from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
 def standardize_results(results):
@@ -35,14 +34,15 @@ def standardize_results(results):
         flights.append(flight)
     return flights   
 
-def get_flights(browser, origin, destination, date):
-    context = browser.new_context(
+def get_flights(origin, destination, date):
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(
+            headless=True
+        )
+    page = browser.new_page(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
-    page = context.new_page()
-
-    stealth_sync(page)
 
     page.goto('https://www.southwest.com/air/booking/', wait_until="networkidle")
 
@@ -52,8 +52,6 @@ def get_flights(browser, origin, destination, date):
     page.locator("input#originationAirportCode").fill(origin)
     page.locator("input#destinationAirportCode").fill(destination)
     page.locator("input#departureDate").fill(f'{date[5:7]}/{date[8:10]}')
-    page.locator("#form-mixin--submit-button").click()
-
     flights = list()
     tries = 0
     rawResponse = None
@@ -62,11 +60,13 @@ def get_flights(browser, origin, destination, date):
             return []
         tries += 1
         with page.expect_response("https://www.southwest.com/api/air-booking/v1/air-booking/page/air/booking/shopping") as response_info:
+            page.locator("#form-mixin--submit-button").click()
             rawResponse = response_info.value.json()
-            if rawResponse['success']:
+            if rawResponse and 'success' in rawResponse:
                 break
-        page.locator("#form-mixin--submit-button").click()
-    context.close()
+    page.close()
+    browser.close()
+    playwright.stop()
 
     results = rawResponse["data"]["searchResults"]["airProducts"][0]["details"]
     flights = standardize_results(results)

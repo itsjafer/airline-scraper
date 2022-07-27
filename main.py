@@ -22,14 +22,9 @@ def get_delta():
     destination = request.form['destination'].upper()
     date = request.form['date']
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False
-        )
+    deltaFlights = delta.get_flights(origin, destination, date)
 
-        deltaFlights = delta.get_flights(browser, origin, destination, date)
-
-        return jsonify(deltaFlights)
+    return jsonify(deltaFlights)
 
 @app.route('/united', methods=['POST'])
 def get_united():
@@ -37,14 +32,9 @@ def get_united():
     destination = request.form['destination'].upper()
     date = request.form['date']
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False
-        )
+    unitedFlights = united.get_flights(origin, destination, date)
 
-        unitedFlights = united.get_flights(browser, origin, destination, date)
-
-        return jsonify(unitedFlights)
+    return jsonify(unitedFlights)
 
 @app.route('/chase', methods=['POST'])
 def get_chase():
@@ -52,14 +42,9 @@ def get_chase():
     destination = request.form['destination'].upper()
     date = request.form['date']
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False
-        )
+    chaseFlights = skippedlagged.get_flights(origin, destination, date)
 
-        chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
-
-        return jsonify(chaseFlights)
+    return jsonify(chaseFlights)
 
 @app.route('/southwest', methods=['POST'])
 def get_southwest():
@@ -67,14 +52,9 @@ def get_southwest():
     destination = request.form['destination'].upper()
     date = request.form['date']
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False
-        )
+    southwestFlights = southwest.get_flights(origin, destination, date)
 
-        southwestFlights = southwest.get_flights(browser, origin, destination, date)
-
-        return jsonify(southwestFlights)
+    return jsonify(southwestFlights)
         
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

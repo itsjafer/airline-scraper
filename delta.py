@@ -56,11 +56,14 @@ def standardize_results(raw):
     return results   
 
 def get_flights(browser, origin, destination, date):
-    context = browser.new_context(
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(
+            headless=True
+        )
+    page = browser.new_page(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
-    page = context.new_page()
 
     stealth_sync(page)
 
@@ -100,12 +103,14 @@ def get_flights(browser, origin, destination, date):
     page.locator("#chkFlexDate").evaluate("node => node.removeAttribute('disabled')")
     page.locator("#chkFlexDate").uncheck(force=True)
 
-    page.locator("#btnSubmit").click()
 
     flights = list()
     with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
+        page.locator("#btnSubmit").click()
         rawResponse = response_info.value.json()
         flights = standardize_results(rawResponse)
-    context.close()
+    page.close()
+    browser.close()
+    playwright.stop()
 
     return flights

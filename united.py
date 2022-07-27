@@ -78,25 +78,30 @@ def standardize_results(trip):
         results.append(result)
     return results
 
-def get_flights(browser, origin, destination, date):
-    context = browser.new_context(
+def get_flights(origin, destination, date):
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(
+            headless=True
+        )
+    page = browser.new_page(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
-    page = context.new_page()
 
     stealth_sync(page)
 
     url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
-    page.goto(url)
 
     flights = list()
     with page.expect_response("https://www.united.com/api/flight/FetchFlights") as response_info:
+        page.goto(url)
         rawResponse = response_info.value.json()
         if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
             trips = rawResponse['data']['Trips']
             flights = standardize_results(trips[0])
-    context.close()
+    page.close()
+    browser.close()
+    playwright.stop()
 
     return flights
             
