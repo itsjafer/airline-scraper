@@ -32,7 +32,8 @@ ADD . /app
 WORKDIR /app
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN python -m playwright install
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN python3 -m playwright install
 
 EXPOSE $PORT
 
