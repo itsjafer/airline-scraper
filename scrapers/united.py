@@ -101,4 +101,4 @@ def get_flights(origin, destination, date):
         return flights
             
 
-print(get_flights("ORD", "LGA", "2022-09-23"))
+print(get_flights("JFK", "CAI", "2022-12-30"))
