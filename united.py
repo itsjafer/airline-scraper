@@ -78,11 +78,11 @@ def standardize_results(trip):
     return results
 
 def get_flights(browser, origin, destination, date):
-    context = browser.new_context()
-    page = context.new_page(
+    context = browser.new_context(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
+    page = context.new_page()
 
     url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
     page.goto(url)
@@ -93,7 +93,7 @@ def get_flights(browser, origin, destination, date):
         if (rawResponse['data']['Trips'] and len(rawResponse['data']['Trips']) > 0):
             trips = rawResponse['data']['Trips']
             flights = standardize_results(trips[0])
-    browser.close()
+    context.close()
 
     return flights
             

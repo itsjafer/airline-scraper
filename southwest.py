@@ -35,11 +35,11 @@ def standardize_results(results):
     return flights   
 
 def get_flights(browser, origin, destination, date):
-    context = browser.new_context()
-    page = context.new_page(
+    context = browser.new_context(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
+    page = context.new_page()
 
     page.goto('https://www.southwest.com/air/booking/', wait_until="networkidle")
 
@@ -63,7 +63,7 @@ def get_flights(browser, origin, destination, date):
             if rawResponse['success']:
                 break
         page.locator("#form-mixin--submit-button").click()
-    browser.close()
+    context.close()
 
     results = rawResponse["data"]["searchResults"]["airProducts"][0]["details"]
     flights = standardize_results(results)

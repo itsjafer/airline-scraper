@@ -39,11 +39,11 @@ def standardize_results(rawResponse, pointsFactor):
 
 
 def get_flights(browser, origin, destination, date, pointsFactor=1.25):
-    context = browser.new_context()
-    page = context.new_page(
+    context = browser.new_context(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
+    page = context.new_page()
 
     stealth_sync(page)
 
@@ -53,6 +53,6 @@ def get_flights(browser, origin, destination, date, pointsFactor=1.25):
     with page.expect_response(lambda response: "search.php" in response.url) as response_info:
         rawResponse = response_info.value.json()
         flights = standardize_results(rawResponse, pointsFactor)
-    
+    context.close()
     return flights
        

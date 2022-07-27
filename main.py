@@ -27,22 +27,11 @@ def get_flights():
             headless=True
         )
 
-        try:
-            deltaFlights = delta.get_flights(browser, origin, destination, date)
-        except:
-            deltaFlights = []
-        try:
-            unitedFlights = united.get_flights(browser, origin, destination, date)
-        except:
-            unitedFlights = []
-        try:
-            chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
-        except:
-            chaseFlights = []
-        try:
-            southwestFlights = southwest.get_flights(browser, origin, destination, date)
-        except:
-            southwestFlights = []
+        deltaFlights = delta.get_flights(browser, origin, destination, date)
+        unitedFlights = united.get_flights(browser, origin, destination, date)
+        chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
+        southwestFlights = southwest.get_flights(browser, origin, destination, date)
+        print(deltaFlights)
 
         return jsonify(deltaFlights + chaseFlights + unitedFlights + southwestFlights)
         

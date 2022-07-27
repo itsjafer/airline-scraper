@@ -56,11 +56,11 @@ def standardize_results(raw):
     return results   
 
 def get_flights(browser, origin, destination, date):
-    context = browser.new_context()
-    page = context.new_page(
+    context = browser.new_context(
         user_agent=USER_AGENT,
         viewport=VIEWPORT
     )
+    page = context.new_page()
 
     stealth_sync(page)
 
@@ -106,6 +106,6 @@ def get_flights(browser, origin, destination, date):
     with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
         rawResponse = response_info.value.json()
         flights = standardize_results(rawResponse)
-    browser.close()
+    context.close()
 
     return flights
