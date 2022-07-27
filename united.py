@@ -101,7 +101,6 @@ def get_flights(origin, destination, date):
                 flights = standardize_results(trips[0])
         page.close()
         browser.close()
-        playwright.stop()
 
         return flights
             

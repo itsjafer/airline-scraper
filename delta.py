@@ -112,6 +112,5 @@ def get_flights(origin, destination, date):
             flights = standardize_results(rawResponse)
         page.close()
         browser.close()
-        playwright.stop()
 
         return flights
