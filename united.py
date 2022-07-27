@@ -88,8 +88,6 @@ def get_flights(origin, destination, date):
         viewport=VIEWPORT
     )
 
-    stealth_sync(page)
-
     url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
 
     flights = list()

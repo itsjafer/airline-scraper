@@ -48,9 +48,6 @@ def get_flights(origin, destination, date, pointsFactor=1.25):
         viewport=VIEWPORT
     )
 
-    stealth_sync(page)
-
-
     flights = list()
     with page.expect_response(lambda response: "search.php" in response.url) as response_info:
         page.goto(f'https://skiplagged.com/flights/{origin}/{destination}/{date}#')
