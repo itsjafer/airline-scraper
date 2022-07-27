@@ -27,7 +27,7 @@ def standardize_results(raw):
         for fare in group['airBounds']:
             try:
                 cabin = { 
-                    "eco": "business", 
+                    "eco": "economy", 
                     "ecoPremium": "economy", 
                     "business": "business", 
                     "first": "first",
