@@ -38,26 +38,21 @@ def standardize_results(rawResponse, pointsFactor):
     return results
 
 
-def get_flights(origin, destination, date, pointsFactor=1.25):
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True
-        )
-        page = browser.new_page(
-            user_agent=USER_AGENT,
-            viewport=VIEWPORT
-        )
+def get_flights(browser, origin, destination, date, pointsFactor=1.25):
+    context = browser.new_context()
+    page = context.new_page(
+        user_agent=USER_AGENT,
+        viewport=VIEWPORT
+    )
 
-        stealth_sync(page)
+    stealth_sync(page)
 
-        page.goto(f'https://skiplagged.com/flights/{origin}/{destination}/{date}#', wait_until="domcontentloaded")
+    page.goto(f'https://skiplagged.com/flights/{origin}/{destination}/{date}#', wait_until="domcontentloaded")
 
-        flights = list()
-        with page.expect_response(lambda response: "search.php" in response.url) as response_info:
-            rawResponse = response_info.value.json()
-            flights = standardize_results(rawResponse, pointsFactor)
-        
-        return flights
+    flights = list()
+    with page.expect_response(lambda response: "search.php" in response.url) as response_info:
+        rawResponse = response_info.value.json()
+        flights = standardize_results(rawResponse, pointsFactor)
+    
+    return flights
        
-
-print(get_flights("JFK", "CAI", "2022-12-30"))
