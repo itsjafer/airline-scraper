@@ -24,7 +24,7 @@ def get_delta():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True
+            headless=False
         )
 
         deltaFlights = delta.get_flights(browser, origin, destination, date)
@@ -39,7 +39,7 @@ def get_united():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True
+            headless=False
         )
 
         unitedFlights = united.get_flights(browser, origin, destination, date)
@@ -54,7 +54,7 @@ def get_chase():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True
+            headless=False
         )
 
         chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
@@ -69,7 +69,7 @@ def get_southwest():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True
+            headless=False
         )
 
         southwestFlights = southwest.get_flights(browser, origin, destination, date)

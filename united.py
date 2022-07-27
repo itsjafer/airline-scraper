@@ -1,5 +1,6 @@
 import json
 from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
 def standardize_results(trip):
@@ -83,6 +84,8 @@ def get_flights(browser, origin, destination, date):
         viewport=VIEWPORT
     )
     page = context.new_page()
+
+    stealth_sync(page)
 
     url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
     page.goto(url)
