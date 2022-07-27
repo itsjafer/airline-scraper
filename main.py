@@ -16,8 +16,8 @@ def hello_world():
     name = os.environ.get("NAME", "World")
     return "Hello {}!".format(name)
 
-@app.route('/get_flights', methods=['POST'])
-def get_flights():
+@app.route('/delta', methods=['POST'])
+def delta():
     origin = request.form['origin'].upper()
     destination = request.form['destination'].upper()
     date = request.form['date']
@@ -28,12 +28,53 @@ def get_flights():
         )
 
         deltaFlights = delta.get_flights(browser, origin, destination, date)
-        unitedFlights = united.get_flights(browser, origin, destination, date)
-        chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
-        southwestFlights = southwest.get_flights(browser, origin, destination, date)
-        print(deltaFlights)
 
-        return jsonify(deltaFlights + chaseFlights + unitedFlights + southwestFlights)
+        return jsonify(deltaFlights)
+
+@app.route('/united', methods=['POST'])
+def united():
+    origin = request.form['origin'].upper()
+    destination = request.form['destination'].upper()
+    date = request.form['date']
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True
+        )
+
+        unitedFlights = united.get_flights(browser, origin, destination, date)
+
+        return jsonify(unitedFlights)
+
+@app.route('/chase', methods=['POST'])
+def chase():
+    origin = request.form['origin'].upper()
+    destination = request.form['destination'].upper()
+    date = request.form['date']
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True
+        )
+
+        chaseFlights = skippedlagged.get_flights(browser, origin, destination, date)
+
+        return jsonify(chaseFlights)
+
+@app.route('/southwest', methods=['POST'])
+def southwest():
+    origin = request.form['origin'].upper()
+    destination = request.form['destination'].upper()
+    date = request.form['date']
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True
+        )
+
+        southwestFlights = southwest.get_flights(browser, origin, destination, date)
+
+        return jsonify(southwestFlights)
         
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

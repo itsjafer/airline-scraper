@@ -1,4 +1,4 @@
-class StandardFlight:
+class StandardFlight(dict):
     def __init__(self, departureDateTime, arrivalDateTime, origin, destination, flightNo, duration, fares):
         self.departureDateTime = departureDateTime
         self.arrivalDateTime = arrivalDateTime
@@ -7,6 +7,7 @@ class StandardFlight:
         self.flightNo = flightNo
         self.duration = duration
         self.fares = fares
+        dict.__init__(self, departureDateTime = departureDateTime, arrivalDateTime = arrivalDateTime, origin = origin, destination = destination, flightNo = flightNo, duration = duration, fares = fares)
 
     def __str__(self):
         return f"{self.flightNo}: {self.origin} on {self.departureDateTime} -> {self.destination} on {self.arrivalDateTime}. Fares: {self.fares}.\n"
