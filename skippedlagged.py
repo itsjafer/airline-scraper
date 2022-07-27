@@ -27,6 +27,7 @@ def standardize_results(rawResponse, pointsFactor):
                         "cash": 0,
                         "currencyOfCash": "USD",
                         "bookingClass": None,
+                        "scraper": "Chase Ultimate Rewards",
                     }
             standardFares.append(fare)
         lowestFare = None

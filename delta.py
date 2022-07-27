@@ -45,6 +45,7 @@ def standardize_results(raw):
                         "cash": cash,
                         "currencyOfCash": currencyOfCash,
                         "bookingClass": fare['brandInfoByFlightLegs'][0]['cos'],
+                        "scraper": "Delta",
                     }
             try:
                 index, existingFare = next((i,v) for i,v in enumerate(flight.fares) if v['cabin'] == cabin)

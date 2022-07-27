@@ -27,6 +27,7 @@ def standardize_results(results):
                         "cash": int(float(product["fare"]["totalTaxesAndFees"]["value"])),
                         "currencyOfCash": product["fare"]["totalTaxesAndFees"]["currencyCode"],
                         "bookingClass": product["productId"].split(",")[1],
+                        "scraper": "Southwest",
                     }
             if (not lowestFare) or fare["miles"] < lowestFare["miles"]:
                 lowestFare = fare

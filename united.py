@@ -63,6 +63,7 @@ def standardize_results(trip):
                         "cash": cash,
                         "currencyOfCash": currencyOfCash,
                         "bookingClass": bookingClass,
+                        "scraper": "United",
                     }
             except StopIteration as e:
                 result.fares.append(
@@ -72,6 +73,7 @@ def standardize_results(trip):
                         "cash": cash,
                         "currencyOfCash": currencyOfCash,
                         "bookingClass": bookingClass,
+                        "scraper": "United",
                     }
                 )
 
