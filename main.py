@@ -44,7 +44,7 @@ def get_flights():
         except:
             southwestFlights = []
 
-        return deltaFlights + chaseFlights + unitedFlights + southwestFlights
+        return jsonify(deltaFlights + chaseFlights + unitedFlights + southwestFlights)
         
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
