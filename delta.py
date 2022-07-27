@@ -55,7 +55,7 @@ def standardize_results(raw):
         results.append(flight)
     return results   
 
-def get_flights(browser, origin, destination, date):
+def get_flights(origin, destination, date):
     playwright = sync_playwright().start()
     browser = playwright.chromium.launch(
             headless=True

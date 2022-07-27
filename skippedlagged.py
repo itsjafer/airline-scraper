@@ -38,7 +38,7 @@ def standardize_results(rawResponse, pointsFactor):
     return results
 
 
-def get_flights(browser, origin, destination, date, pointsFactor=1.25):
+def get_flights(origin, destination, date, pointsFactor=1.25):
     playwright = sync_playwright().start()
     browser = playwright.chromium.launch(
             headless=True
