@@ -10,7 +10,7 @@ def standardize_results(rawResponse, pointsFactor):
         
         result = StandardFlight(
             flight["segments"][0]["departure"]["time"].replace("T", " ")[0:16], 
-            flight["segments"][0]["arrival"]["time"].replace("T", " ")[0:16], 
+            flight["segments"][-1]["arrival"]["time"].replace("T", " ")[0:16], 
             flight["segments"][0]["departure"]["airport"], 
             flight["segments"][-1]["arrival"]["airport"], 
             ", ".join([f'{segment["airline"]} {segment["flight_number"]}' for segment in flight["segments"]]), 
