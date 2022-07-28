@@ -58,7 +58,7 @@ def standardize_results(raw):
 
 def get_flights(origin, destination, date):
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
+        browser = playwright.firefox.launch(
                 headless=True
             )
         page = browser.new_page(
@@ -106,10 +106,20 @@ def get_flights(origin, destination, date):
 
 
         flights = list()
-        with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
-            page.locator("#btnSubmit").click()
-            rawResponse = response_info.value.json()
-            flights = standardize_results(rawResponse)
+        tries = 0
+        while True:
+            if tries == 2:
+                return []
+            try:
+                with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
+                    page.locator("#btnSubmit").click()
+                    rawResponse = response_info.value.json()
+                    flights = standardize_results(rawResponse)
+                    break
+            except PlaywrightTimeoutError:
+                tries += 1
+                time.sleep(5)
+
         page.close()
         browser.close()
 
