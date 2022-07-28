@@ -58,11 +58,8 @@ def standardize_results(raw):
 
 def get_flights(origin, destination, date):
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
-                headless=True,
-                args = [
-                    '--use-gl=egl'
-                ]
+        browser = playwright.firefox.launch(
+                headless=False,
             )
         page = browser.new_page(
             user_agent=USER_AGENT,
