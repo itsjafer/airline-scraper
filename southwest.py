@@ -45,7 +45,7 @@ def get_flights(origin, destination, date):
             viewport=VIEWPORT
         )
 
-        page.goto('https://www.southwest.com/air/booking/', wait_until="networkidle")
+        page.goto('https://www.southwest.com/air/booking/')
 
         # Fill in values
         page.locator("input[value='oneway']").check()
