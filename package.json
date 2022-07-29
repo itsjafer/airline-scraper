@@ -4,6 +4,7 @@
   "main": "scrapers.js",
   "type": "module",
   "dependencies": {
+    "busboy": "^1.6.0",
     "playwright-aws-lambda": "^0.9.0",
     "playwright-core": "^1.24.2"
   }
