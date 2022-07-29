@@ -4,11 +4,23 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 import math
+import datetime
 
-def standardize_results(rawResponse):
+
+def convertTo24(time):
+    in_time = datetime.datetime.strptime(time, "%I:%M %p")
+    out_time = datetime.datetime.strftime(in_time, "%H:%M")
+    return out_time
+
+def addToDate(date, days):
+    date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
+    end_date = date_1 + datetime.timedelta(days=days)
+    return datetime.datetime.strftime(end_date, "%Y-%m-%d")
+
+def standardize_results(rawResponse, date):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(
-                headless=True,
+                headless=False,
                 args = [
                     '--use-gl=egl'
                 ]
@@ -22,17 +34,68 @@ def standardize_results(rawResponse):
         page.set_content(rawResponse)
 
         elements = page.query_selector_all(".optionList > li")
-
+        results = []
         for element in elements:
-            flightNo = element.query_selector('.optionHeaderFltNum').get_attribute("innerText")
-            if not flightNo.trim().startswith("Flight"):
-                continue
+            flightNo = element.query_selector('.optionHeaderFltNum').inner_text()
+            if not flightNo.strip().startswith("Flight"):
+                flightNo = f"Unknown ({flightNo.strip()[0]} flights)"
+            else:
+                flightNo = flightNo.split(" ")[1]
 
-            airlineCode = element.query_selector('.optionsHeader > img').get_attribute("src").split("/")[-1].split(".")[0]
-            origin = element.query_selector('optionDeparts .optionCityCode').get_attribute('innerText')
-            destination = element.query_selector('.left .optionCityCode').get_attribute('innerText')
+            airlineCode = element.query_selector('.optionHeader > img').evaluate("node => node.src").split("/")[-1]
+            origin = element.query_selector('.optionDeparts .optionCityCode').inner_text()
+            destination = element.query_selector('.left .optionCityCode').inner_text()
 
-            print(airlineCode, flightNo, origin, destination)
+
+            departureDate = date # for now, assume correct date
+            departureTime = element.query_selector(".optionDeparts .optionTime .b").inner_text()
+            arrivalTime = element.query_selector(".left .optionTime .b").inner_text()
+            try:
+                addDays = element.query_selector('.left .optionTime .arrivalDaysDifferent').inner_text()
+            except:
+                addDays = None
+
+            result = StandardFlight(
+                f"{departureDate} {convertTo24(departureTime)}:00", 
+                f"{addToDate(departureDate, int(addDays[1])) if addDays else departureDate} {convertTo24(arrivalTime)}:00", 
+                origin, 
+                destination, 
+                f"{airlineCode} {flightNo}", 
+                0, 
+                []
+            )
+
+            fares = element.query_selector_all(".fare-ctn div[style='display: block;']:not(.fareNotSelectedDisabled)")
+
+            for fare in fares:
+                milesAndCash = fare.query_selector(".farepriceaward").inner_text()
+                cabin = fare.query_selector('.farefam').inner_text()
+                if (not milesAndCash or not cabin):
+                    continue
+                
+                miles = milesAndCash.split("+")[0]
+                numeric_filter = filter(str.isdigit, miles)
+                numeric_miles = int("".join(numeric_filter)) * 1000
+
+                cash = milesAndCash.split("+")[1]
+                numeric_filter = filter(str.isdigit, cash)
+                numeric_cash = float("".join(numeric_filter))
+
+                standardCabin = { "Main": "economy", "First Class": "business" }[cabin] if airlineCode == "AS" else { "Main": "economy", "Partner Business": "business", "First Class": "first" }[cabin]
+
+                flightFare = {
+                    "cash": numeric_cash,
+                    "miles": numeric_miles,
+                    "currencyOfCash": "USD",
+                    "cabin": standardCabin,
+                    "bookingClass": None,
+                    "scraper": "Alaska Airlines"       
+                }
+                result.fares.append(flightFare)
+            results.append(result)
+        return results
+
+                
 
 def get_flights(origin, destination, date):
     url = 'https://m.alaskaair.com/shopping/flights'
@@ -50,11 +113,8 @@ def get_flights(origin, destination, date):
     x = requests.post(url, headers=header, data=body)
 
     if not x.ok:
-        return []
-    flights = []
+        raise Exception("Did not receive 200 from Alaska")
     rawResponse = x.text
-    flights = standardize_results(rawResponse)
+    flights = standardize_results(rawResponse, date)
 
     return flights
-
-get_flights("ORD", "LGA", "2022-09-01")

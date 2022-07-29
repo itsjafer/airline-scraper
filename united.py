@@ -100,7 +100,7 @@ def get_flights(origin, destination, date):
         tries = 0
         while True:
             if tries == 2:
-                return []
+                raise Exception("Unable to get flights for United")
             try:
                 with page.expect_response("https://www.united.com/api/flight/FetchFlights", timeout=20000) as response_info:
                     page.goto(url)

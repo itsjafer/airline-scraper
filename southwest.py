@@ -61,7 +61,7 @@ def get_flights(origin, destination, date):
         rawResponse = None
         while True:
             if tries == 5:
-                return []
+                raise Exception("Unable to get flights for Southwest")
             tries += 1
             with page.expect_response("https://www.southwest.com/api/air-booking/v1/air-booking/page/air/booking/shopping") as response_info:
                 page.locator("#form-mixin--submit-button").click()

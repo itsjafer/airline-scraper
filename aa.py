@@ -74,7 +74,7 @@ def get_flights(origin, destination, date):
     x = requests.post(url, headers=header, json=body)
 
     if not x.ok:
-        return []
+        raise Exception("Failed to get OK response from American Airlines")
     flights = []
     rawResponse = x.json()
     if 'slices' in rawResponse and len(rawResponse['slices']) > 0:

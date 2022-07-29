@@ -89,7 +89,7 @@ def get_flights(origin, destination, date):
         tries = 0
         while True:
             if tries == 9:
-                return []
+                raise Exception("Unable to select date for Delta")
             tries += 1
             if not page.is_visible(f"a[data-date^='{formatted_date}']"):
                 page.locator("a[aria-label='Next']:not([class*='no-next'])").click()
@@ -109,7 +109,7 @@ def get_flights(origin, destination, date):
         tries = 0
         while True:
             if tries == 2:
-                return []
+                raise Exception("Unable to get flights for Delta")
             try:
                 with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
                     page.locator("#btnSubmit").click()

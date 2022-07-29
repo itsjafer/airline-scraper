@@ -80,8 +80,7 @@ def get_flights(origin, destination, date):
         tries = 0
         while True:
             if tries == 2:
-                return []
-                
+                raise Exception("Unable to get flights for JetBlue")
             try:
                 with page.expect_response(lambda x: "outboundLFS" in x.url and x.request.method == "POST", timeout=20000) as response_info:
                     page.goto(url)

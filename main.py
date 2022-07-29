@@ -3,7 +3,7 @@ import requests
 import os
 import sys
 
-import united, southwest, delta, skippedlagged, aeroplan, jetblue, virgin, aa
+import united, southwest, delta, skippedlagged, aeroplan, jetblue, virgin, aa, alaska
 from playwright.sync_api import sync_playwright
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -95,6 +95,16 @@ def get_aa():
     aaFlights = aa.get_flights(origin, destination, date)
 
     return jsonify(aaFlights)
+
+@app.route('/alaska', methods=['POST'])
+def get_alaska():
+    origin = request.form['origin'].upper()
+    destination = request.form['destination'].upper()
+    date = request.form['date']
+
+    alaskaFlights = alaska.get_flights(origin, destination, date)
+
+    return jsonify(alaskaFlights)
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), threaded=False)
