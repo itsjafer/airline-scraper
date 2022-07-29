@@ -5,7 +5,7 @@ from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 import math
 import datetime
-
+import re
 
 def convertTo24(time):
     in_time = datetime.datetime.strptime(time, "%I:%M %p")
@@ -74,15 +74,12 @@ def standardize_results(rawResponse, date):
                     continue
                 
                 miles = milesAndCash.split("+")[0]
-                numeric_filter = filter(str.isdigit, miles)
-                numeric_miles = int("".join(numeric_filter)) * 1000
+                numeric_miles = int(float(re.sub(r'[^\d.]+', '', miles)) * 1000)
 
                 cash = milesAndCash.split("+")[1]
-                numeric_filter = filter(str.isdigit, cash)
-                numeric_cash = float("".join(numeric_filter))
+                numeric_cash = int(float(re.sub(r'[^\d.]+', '', cash)))
 
-                standardCabin = { "Main": "economy", "First Class": "business" }[cabin] if airlineCode == "AS" else { "Main": "economy", "Partner Business": "business", "First Class": "first" }[cabin]
-
+                standardCabin = { "Main": "economy", "First Class": "business" }[cabin] if airlineCode == "AS" else { "Main": "economy", "Partner Business": "business", "First Class": "business" }[cabin]
                 flightFare = {
                     "cash": numeric_cash,
                     "miles": numeric_miles,
@@ -118,3 +115,5 @@ def get_flights(origin, destination, date):
     flights = standardize_results(rawResponse, date)
 
     return flights
+
+get_flights("ORD", "LGA", "2022-10-14")
