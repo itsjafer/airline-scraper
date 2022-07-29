@@ -1,4 +1,5 @@
 import json
+import time
 from playwright.sync_api import sync_playwright
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
@@ -68,6 +69,7 @@ def get_flights(origin, destination, date):
                 rawResponse = response_info.value.json()
                 if rawResponse and 'success' in rawResponse:
                     break
+                time.sleep(2)
         page.close()
         browser.close()
 
