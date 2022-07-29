@@ -101,7 +101,7 @@ export const united = async (req, res) => {
           flights = standardizeResults(raw.data.Trips[0])
         }
         break;
-      } catch {
+      } catch (error) {
         tries += 1
       }
     }
