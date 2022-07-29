@@ -1,5 +1,5 @@
 import playwright from 'playwright-aws-lambda'
-import { Busboy } from 'busboy'
+import Busboy from 'busboy'
 function StandardFlight(departTime, arrivalTime, origin, destination, flightNo, duration, fares) {
   return {
     departureDateTime: departTime,
@@ -101,7 +101,6 @@ export const unitedFunc = async (origin, destination, date) => {
       tries += 1
     }
   }
-  res.status(200).send(flights);
   return JSON.stringify(flights)
 };
 
@@ -122,6 +121,7 @@ export const united = async (req, res) => {
 
   busboy.end(req.rawBody);
 
-  return await united(fields['origin'], fields['destination'], fields['date'])
+  let flights = await unitedFunc(fields['origin'], fields['destination'], fields['date'])
+  res.status(200).send(flights);
 
 }
