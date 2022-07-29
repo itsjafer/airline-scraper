@@ -18,7 +18,6 @@ def standardize_results(trip):
         )
 
         if flight['Origin'] != trip['RequestedOrigin'] and flight['Origin'] != trip['Origin']:
-            print(result)
             continue
         
         if flight['Destination'] != trip['RequestedDestination'] and flight['Destination'] != trip['Destination']:

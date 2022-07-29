@@ -33,7 +33,6 @@ def standardize_results(raw):
                     "first": "first",
                     }[fare['availabilityDetails'][0]['cabin']]
             except:
-                print(fare['availabilityDetails'][0]['cabin'])
                 continue
 
             bookingClass = fare['availabilityDetails'][0]
