@@ -76,7 +76,7 @@ export const united = async (req, res) => {
   let browser = null;
   let flights = []
   try {
-    browser = await playwright.launchChromium();
+    browser = await playwright.launchChromium({headless:true});
     const context = await browser.newContext({
         userAgent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36",
         viewport: { 'width': 1920, 'height': 1080 }
@@ -87,16 +87,25 @@ export const united = async (req, res) => {
     let destination = "LGA"
     let date = "2022-09-02"
 
-    page.goto(`https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False`);
+    let tries = 0
+    while (true) {
+      if (tries == 2)
+        throw new Error("Unable to get flights for United")
+      try {
+        page.goto(`https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False`);
+        const response = await page.waitForResponse("https://www.united.com/api/flight/FetchFlights")
 
+        const raw = await response.json()
 
-    const response = await page.waitForResponse("https://www.united.com/api/flight/FetchFlights")
-
-    const raw = await response.json()
-
-    if (raw.data.Trips && raw.data.Trips.length > 0) {
-      flights = standardizeResults(raw.data.Trips[0])
+        if (raw.data.Trips && raw.data.Trips.length > 0) {
+          flights = standardizeResults(raw.data.Trips[0])
+        }
+        break;
+      } catch {
+        tries += 1
+      }
     }
+    
 
   } catch (error) {
     throw error;
