@@ -7,9 +7,12 @@ import united, southwest, delta, skippedlagged, aeroplan, jetblue, virgin, aa, a
 from playwright.sync_api import sync_playwright
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_caching import Cache
 
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 app = Flask(__name__)
 CORS(app)
+cache.init_app(app)
 
 @app.route("/")
 def hello_world():
