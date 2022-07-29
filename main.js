@@ -1,3 +1,3 @@
-import { united } from "./scrapers.js";
+import { unitedFunc } from "./scrapers.js";
 
-console.log(await united())
+console.log(await unitedFunc("ORD", "LGA", "2022-08-27"))
