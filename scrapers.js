@@ -1,5 +1,5 @@
 import playwright from 'playwright-aws-lambda'
-
+import { Busboy } from 'busboy'
 function StandardFlight(departTime, arrivalTime, origin, destination, flightNo, duration, fares) {
   return {
     departureDateTime: departTime,
@@ -72,19 +72,16 @@ const standardizeResults = (trip) => {
   return results
 }
 
-export const united = async (req, res) => {
+export const unitedFunc = async (origin, destination, date) => {
   let browser = null;
   let flights = []
-  browser = await playwright.launchChromium();
+  browser = await playwright.launchChromium({headless:true});
   const context = await browser.newContext({
       userAgent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36",
       viewport: { 'width': 1920, 'height': 1080 }
   });
 
   const page = await context.newPage();
-  let origin = "ORD"
-  let destination = "LGA"
-  let date = "2022-09-02"
 
   let tries = 0
   while (true) {
@@ -107,3 +104,24 @@ export const united = async (req, res) => {
   res.status(200).send(flights);
   return JSON.stringify(flights)
 };
+
+export const united = async (req, res) => {
+  if (req.method !== 'POST') {
+    // Return a "method not allowed" error
+    return res.status(405).end();
+  }
+
+  const busboy = Busboy({headers: req.headers});
+  const fields = {};
+
+  // This code will process each non-file field in the form.
+  busboy.on('field', (fieldname, val) => {
+    console.log(`Processed field ${fieldname}: ${val}.`);
+    fields[fieldname] = val;
+  });
+
+  busboy.end(req.rawBody);
+
+  return await united(fields['origin'], fields['destination'], fields['date'])
+
+}
