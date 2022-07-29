@@ -75,43 +75,33 @@ const standardizeResults = (trip) => {
 export const united = async (req, res) => {
   let browser = null;
   let flights = []
-  try {
-    browser = await playwright.launchChromium({headless:true});
-    const context = await browser.newContext({
-        userAgent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36",
-        viewport: { 'width': 1920, 'height': 1080 }
-    });
+  browser = await playwright.launchChromium({headless:true});
+  const context = await browser.newContext({
+      userAgent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36",
+      viewport: { 'width': 1920, 'height': 1080 }
+  });
 
-    const page = await context.newPage();
-    let origin = "ORD"
-    let destination = "LGA"
-    let date = "2022-09-02"
+  const page = await context.newPage();
+  let origin = "ORD"
+  let destination = "LGA"
+  let date = "2022-09-02"
 
-    let tries = 0
-    while (true) {
-      if (tries == 2)
-        throw new Error("Unable to get flights for United")
-      try {
-        page.goto(`https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False`);
-        const response = await page.waitForResponse("https://www.united.com/api/flight/FetchFlights")
+  let tries = 0
+  while (true) {
+    if (tries == 2)
+      throw new Error("Unable to get flights for United")
+    try {
+      page.goto(`https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False`);
+      const response = await page.waitForResponse("https://www.united.com/api/flight/FetchFlights")
 
-        const raw = await response.json()
+      const raw = await response.json()
 
-        if (raw.data.Trips && raw.data.Trips.length > 0) {
-          flights = standardizeResults(raw.data.Trips[0])
-        }
-        break;
-      } catch (error) {
-        tries += 1
+      if (raw.data.Trips && raw.data.Trips.length > 0) {
+        flights = standardizeResults(raw.data.Trips[0])
       }
-    }
-    
-
-  } catch (error) {
-    throw error;
-  } finally {
-    if (browser) {
-      await browser.close();
+      break;
+    } catch (error) {
+      tries += 1
     }
   }
   res.status(200).send(flights);
