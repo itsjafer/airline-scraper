@@ -33,7 +33,7 @@ const response = async(req, res, func) => {
   
     busboy.end(req.rawBody);
   
-    let flights = await airlineToFunc["united"](fields['origin'], fields['destination'], fields['date'])
+    let flights = await airlineToFunc[func](fields['origin'], fields['destination'], fields['date'])
     res.status(200).send(flights);
 }
 
