@@ -1,10 +1,11 @@
 {
   "name": "bookwithpoints",
   "version": "0.0.1",
-  "main": "scrapers.js",
+  "main": "main.js",
   "type": "module",
   "dependencies": {
     "busboy": "^1.6.0",
+    "node-fetch": "^3.2.9",
     "playwright-aws-lambda": "^0.9.0",
     "playwright-core": "^1.24.2"
   }
