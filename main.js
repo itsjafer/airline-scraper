@@ -8,7 +8,7 @@ const airlineToFunc = {
 }
 
 const response = async(req, res, func) => {
-    es.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Origin', '*');
   
     if (req.method === 'OPTIONS') {
       // Send response to OPTIONS requests
