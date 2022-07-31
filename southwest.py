@@ -63,7 +63,6 @@ def get_flights(origin, destination, date):
             if tries == 5:
                 raise Exception("Unable to get flights for Southwest")
             tries += 1
-            page.screenshot(path="sw.png")
             with page.expect_response("https://www.southwest.com/api/air-booking/v1/air-booking/page/air/booking/shopping") as response_info:
                 page.locator("#form-mixin--submit-button").click()
                 rawResponse = response_info.value.json()
@@ -77,5 +76,3 @@ def get_flights(origin, destination, date):
         flights = standardize_results(results)
 
         return flights
-
-print(get_flights("ORD", "LGA", "2022-08-02"))
