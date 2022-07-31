@@ -47,13 +47,14 @@ def get_flights(origin, destination, date):
         )
 
         page.goto('https://www.southwest.com/air/booking/', wait_until="domcontentloaded")
+        time.sleep(5)
 
         # Fill in values
-        page.locator("input[value='oneway']").click(force=True)
-        page.locator("input[value='oneway']").check(force=True)
         page.locator("input[value='POINTS']").check()
         page.locator("input#originationAirportCode").fill(origin)
         page.locator("input#destinationAirportCode").fill(destination)
+        page.locator("input[value='oneway']").click()
+        page.locator("input[value='oneway']").check(force=True)
         page.locator("input#departureDate").fill(f'{date[5:7]}/{date[8:10]}')
         flights = list()
         tries = 0
@@ -76,3 +77,5 @@ def get_flights(origin, destination, date):
         flights = standardize_results(results)
 
         return flights
+
+print(get_flights("ORD", "LGA", "2022-08-02"))
