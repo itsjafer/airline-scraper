@@ -1,4 +1,6 @@
 import json
+import os
+import time
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
@@ -58,9 +60,14 @@ def standardize_results(raw):
 
 def get_flights(origin, destination, date):
     with sync_playwright() as playwright:
-        browser = playwright.firefox.launch(
-                headless=True
-            )
+        browser = playwright.chromium.launch(
+                headless=False,
+                proxy = {
+                "server": 'http://geo.iproyal.com:22323',
+                "username": 'itsjafer',
+                "password": os.environ.get('iproyal_password')
+            }
+        )
         page = browser.new_page(
             user_agent=USER_AGENT,
             viewport=VIEWPORT
@@ -68,7 +75,7 @@ def get_flights(origin, destination, date):
 
         stealth_sync(page)
 
-        page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="domcontentloaded")
+        page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="domcontentloaded", timeout=60000)
 
         formatted_date = f'{date[5:7]}/{date[8:10]}/{date[0:4]}'
 
@@ -111,12 +118,16 @@ def get_flights(origin, destination, date):
             if tries == 2:
                 raise Exception("Unable to get flights for Delta")
             try:
-                with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
+                with page.expect_response(lambda response: "shop/ow/search" in response.url and response.request.method == "POST") as response_info:
                     page.locator("#btnSubmit").click()
                     rawResponse = response_info.value.json()
                     flights = standardize_results(rawResponse)
                     break
             except PlaywrightTimeoutError:
+                tries += 1
+                time.sleep(5)
+            except Exception as e:
+                print(e)
                 tries += 1
                 time.sleep(5)
 
