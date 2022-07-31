@@ -1,5 +1,5 @@
 import json
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
@@ -68,7 +68,7 @@ def get_flights(origin, destination, date):
 
         stealth_sync(page)
 
-        page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="networkidle")
+        page.goto('https://www.delta.com/flight-search/book-a-flight', wait_until="domcontentloaded")
 
         formatted_date = f'{date[5:7]}/{date[8:10]}/{date[0:4]}'
 

@@ -1,10 +1,13 @@
 import json
-from playwright.sync_api import sync_playwright
+import time
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
 from common import StandardFlight, USER_AGENT, VIEWPORT
 
 def standardize_results(raw):
     results = list()
+    if 'itinerary' not in raw:
+        raise Exception("No flights for this day")
     for itinerary in raw["itinerary"]:
         trip = itinerary['trip'][0]
 
@@ -68,12 +71,19 @@ def get_flights(origin, destination, date):
 
         stealth_sync(page)
 
-        page.goto('https://www.virginatlantic.com/in/en', wait_until="networkidle")
-
+        page.goto('https://www.virginatlantic.com/in/en', wait_until="domcontentloaded")
+        page.reload()
         formatted_date = f'{date[5:7]}/{date[8:10]}/{date[0:4]}'
 
         # Fill in values
-        page.locator("#fromAirportName span.airport-code.d-block").click()
+        try:
+            page.locator("#fromAirportName span.airport-code.d-block").click()
+        except:
+            # Try again
+            page.goto('https://www.virginatlantic.com/in/en', wait_until="domcontentloaded")
+            page.locator("#fromAirportName span.airport-code.d-block").click()
+        page.screenshot(path="v.png")
+
         page.locator("#search_input").fill(origin)
         page.locator(".airportLookup-list .airport-code").first.click()
 
@@ -82,6 +92,9 @@ def get_flights(origin, destination, date):
         page.locator(".airportLookup-list .airport-code").first.click()
 
         page.locator("#chkFlexDate").evaluate("node => node.removeAttribute('visibleLabel')")
+        page.click("#selectTripType-val")
+        page.locator("#ui-list-selectTripType1").click()
+
         page.locator("#selectTripType").select_option("ONE_WAY", force=True)
 
         page.locator("#calDepartLabelCont").click()
@@ -115,6 +128,7 @@ def get_flights(origin, destination, date):
             try:
                 with page.expect_response(lambda response: "shop/ow/search" in response.url) as response_info:
                     page.locator("#btnSubmit").click()
+                    print(response_info.value.text())
                     rawResponse = response_info.value.json()
                     flights = standardize_results(rawResponse)
                     break

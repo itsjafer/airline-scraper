@@ -46,7 +46,7 @@ def get_flights(origin, destination, date):
             viewport=VIEWPORT
         )
 
-        page.goto('https://www.southwest.com/air/booking/')
+        page.goto('https://www.southwest.com/air/booking/', wait_until="domcontentloaded")
 
         # Fill in values
         page.locator("input[value='oneway']").click(force=True)
@@ -76,5 +76,3 @@ def get_flights(origin, destination, date):
         flights = standardize_results(results)
 
         return flights
-
-print(get_flights("ORD", "LGA", "2022-08-01"))
