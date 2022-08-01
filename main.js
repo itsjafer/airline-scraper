@@ -1,10 +1,12 @@
 import { unitedFunc } from "./united.js";
 import { aaFunc } from "./aa.js";
+import { alaskaFunc } from "./alaska.js";
 import Busboy from 'busboy'
 
 const airlineToFunc = {
     "united": unitedFunc,
-    "aa": aaFunc
+    "aa": aaFunc,
+    "alaska": alaskaFunc,
 }
 
 const response = async(req, res, func) => {
@@ -43,4 +45,8 @@ export const united = async (req, res) => {
 
 export const aa = async (req, res) => {
     return await response(req, res, "aa")
+}
+
+export const alaska = async (req, res) => {
+  return await response(req, res, "alaska")
 }
