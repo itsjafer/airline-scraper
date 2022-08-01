@@ -42,7 +42,7 @@ const standardizeResults = (slices) => {
         let existingFare = result.fares.find((fare) => fare.cabin === cabin)
         if (existingFare !== undefined) {
           if (product['perPassengerAwardPoints'] < existingFare.miles)
-            existingFare = { ...fare }
+            existingFare = fare
         } else {
           result.fares.push(fare)
         }
