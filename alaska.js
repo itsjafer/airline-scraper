@@ -79,7 +79,7 @@ const standardizeResults = async (rawResponse, date) => {
       let numericMiles = parseFloat(miles.replace('[^\d.]+', '')) * 1000
 
       let cash = milesAndCash.split("+")[1]
-      let numericCash = parseFloat(cash.replace('[^\d.]+', ''))
+      let numericCash = cash.replace(/[^\d.]+/g, '')
 
       let standardCabin = airlineCode === "AS" ? { Main: "economy", "First Class": "business" }[cabin] : { Main: "economy", "Partner Business": "business", "First Class": "first" }[cabin]
 
@@ -91,6 +91,8 @@ const standardizeResults = async (rawResponse, date) => {
         "bookingClass": null,
         "scraper": "Alaska Airlines"
       }
+
+      console.log(flightFare)
       result.fares.push(flightFare)
     }
     results.push(result)
@@ -126,3 +128,5 @@ export const alaskaFunc = async (origin, destination, date) => {
   return JSON.stringify(flights)
 
 };
+
+await alaskaFunc("LHR", "JFK", "2022-09-01")
