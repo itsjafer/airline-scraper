@@ -39,11 +39,13 @@ const standardizeResults = async (rawResponse, date) => {
   let elements = await page.$$(".optionList > li")
   for (let element of elements) {
     let flightNo = await (await element.$('.optionHeaderFltNum'))?.innerText()
-    if (flightNo?.trim().startsWith("Flight")) {
+    console.log(flightNo)
+    if (!flightNo?.trim().startsWith("Flight")) {
       flightNo = `Unknown (${flightNo.trim()[0]} flights)`
     } else {
       flightNo = flightNo.split(" ")[1]
     }
+
 
     let airlineCode = (await element.$eval(".optionHeader > img", node => node.src)).split("/").splice(-1)[0]
     let origin = await (await element.$(".optionDeparts .optionCityCode"))?.innerText()
@@ -92,7 +94,6 @@ const standardizeResults = async (rawResponse, date) => {
         "scraper": "Alaska Airlines"
       }
 
-      console.log(flightFare)
       result.fares.push(flightFare)
     }
     results.push(result)
@@ -128,5 +129,3 @@ export const alaskaFunc = async (origin, destination, date) => {
   return JSON.stringify(flights)
 
 };
-
-await alaskaFunc("LHR", "JFK", "2022-09-01")
