@@ -86,7 +86,7 @@ const standardizeResults = async (rawResponse, date) => {
       let cash = milesAndCash.split("+")[1]
       let numericCash = cash.replace(/[^\d.]+/g, '')
 
-      let standardCabin = airlineCode === "AS" ? { Main: "economy", "First Class": "business" }[cabin] : { Main: "economy", "Partner Business": "business", "First Class": "first" }[cabin]
+      let standardCabin = airlineCode === "AS" ? { Main: "economy", "First Class": "business" }[cabin] : { Main: "economy", "Partner Business": "business", "First Class": "business" }[cabin]
 
       let flightFare = {
         "cash": numericCash,
