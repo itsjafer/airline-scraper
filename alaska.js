@@ -135,5 +135,3 @@ export const alaskaFunc = async (origin, destination, date) => {
   return JSON.stringify(flights)
 
 };
-
-console.log(await alaskaFunc("ORD", "JFK", "2022-08-31"))
