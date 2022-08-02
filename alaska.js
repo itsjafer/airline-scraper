@@ -2,6 +2,7 @@ import playwright from 'playwright-aws-lambda'
 import fetch from "node-fetch"
 import { addExtra } from 'playwright-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import HttpsProxyAgent from 'https-proxy-agent'
 
 function StandardFlight(departTime, arrivalTime, origin, destination, flightNo, duration, fares) {
   return {
@@ -33,13 +34,15 @@ const standardizeResults = async (rawResponse, date) => {
   });
 
   const page = await context.newPage();
-  await page.goto("https://m.alaskaair.com/shopping/?timeout=true", {waitUntil: "networkidle"})
+  await page.goto("https://m.alaskaair.com/shopping/?timeout=true", {waitUntil: "networkidle", timeout: 60000})
 
   await page.setContent(rawResponse)
   let elements = await page.$$(".optionList > li")
   for (let element of elements) {
     let flightNo = await (await element.$('.optionHeaderFltNum'))?.innerText()
-    console.log(flightNo)
+    if (!flightNo) {
+      continue
+    }
     if (!flightNo?.trim().startsWith("Flight")) {
       flightNo = `Unknown (${flightNo.trim()[0]} flights)`
     } else {
@@ -114,10 +117,13 @@ export const alaskaFunc = async (origin, destination, date) => {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"
   }
 
+  let agent = new HttpsProxyAgent(process.env.USER_ID)
+
   const raw = await fetch(url ,{
     method: "POST",
     headers: header,
-    body: body
+    body: body,
+    agent: agent
   })
 
   const resp = await raw.text()
@@ -129,3 +135,5 @@ export const alaskaFunc = async (origin, destination, date) => {
   return JSON.stringify(flights)
 
 };
+
+console.log(await alaskaFunc("ORD", "JFK", "2022-08-31"))

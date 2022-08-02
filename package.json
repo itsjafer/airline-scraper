@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "busboy": "^1.6.0",
+    "https-proxy-agent": "^5.0.1",
     "node-fetch": "^3.2.9",
     "playwright": "^1.24.2",
     "playwright-aws-lambda": "^0.9.0",

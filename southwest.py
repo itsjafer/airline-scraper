@@ -46,7 +46,7 @@ def get_flights(origin, destination, date):
             viewport=VIEWPORT
         )
 
-        page.goto('https://www.southwest.com/air/booking/', wait_until="domcontentloaded")
+        page.goto('https://www.southwest.com/air/booking/', wait_until="domcontentloaded", timeout=60000)
         time.sleep(5)
 
         # Fill in values
