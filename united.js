@@ -12,6 +12,11 @@ function StandardFlight(departTime, arrivalTime, origin, destination, flightNo, 
   }
 }
 
+const BLOCKED_RESOURCES = [
+  "*/favicon.ico", ".css", ".jpg", ".jpeg", ".png", ".svg", ".woff",
+  "*.optimizely.com", "everesttech.net", "userzoom.com", "doubleclick.net", "googleadservices.com", "adservice.google.com/*",
+  "connect.facebook.com", "connect.facebook.net", "sp.analytics.yahoo.com"]
+  
 const standardizeResults = (trip) => {
   let results = []
   for (let flight of trip.Flights) {
@@ -82,7 +87,8 @@ export const unitedFunc = async (origin, destination, date) => {
   });
 
   const page = await context.newPage();
-
+  const client = await page.context().newCDPSession(page);
+  await client.send("Network.setBlockedURLs", { urls: BLOCKED_RESOURCES })
   let tries = 0
   while (true) {
     if (tries == 2)

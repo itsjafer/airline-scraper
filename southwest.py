@@ -1,7 +1,7 @@
 import json
 import time
 from playwright.sync_api import sync_playwright
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 
 def standardize_results(results):
     flights = list()
@@ -38,13 +38,16 @@ def standardize_results(results):
 
 def get_flights(origin, destination, date):
     with sync_playwright() as playwright:
-        browser = playwright.firefox.launch(
+        browser = playwright.chromium.launch(
                 headless=False,
             )
+
         page = browser.new_page(
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
 
         page.goto('https://www.southwest.com/air/booking/', wait_until="domcontentloaded", timeout=60000)
         time.sleep(5)

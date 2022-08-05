@@ -1,7 +1,7 @@
 import json
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 import math
 
 def standardize_results(raw):
@@ -76,7 +76,8 @@ def get_flights(origin, destination, date):
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
-
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
 
         url = f'https://www.aircanada.com/aeroplan/redeem/availability/outbound?org0={origin}&dest0={destination}&departureDate0={date}&lang=en-CA&tripType=O&ADT=1&YTH=0&CHD=0&INF=0&INS=0&marketCode=DOM'
 

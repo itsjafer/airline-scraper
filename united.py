@@ -2,7 +2,7 @@ import json
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
 import time
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 
 def standardize_results(trip):
     results = list()
@@ -92,7 +92,8 @@ def get_flights(origin, destination, date):
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
-
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
         url = f'https://www.united.com/en/us/fsr/choose-flights?f={origin}&t={destination}&d={date}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches&fareWheel=False'
 
         flights = list()

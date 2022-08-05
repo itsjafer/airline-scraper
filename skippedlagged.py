@@ -1,7 +1,7 @@
 import json
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 
 def standardize_results(rawResponse, pointsFactor):
     results = list()
@@ -51,7 +51,8 @@ def get_flights(origin, destination, date, pointsFactor=1.25):
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
-
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
         flights = list()
         with page.expect_response(lambda response: "search.php" in response.url) as response_info:
             page.goto(f'https://skiplagged.com/flights/{origin}/{destination}/{date}#')

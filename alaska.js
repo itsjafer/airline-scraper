@@ -15,7 +15,11 @@ function StandardFlight(departTime, arrivalTime, origin, destination, flightNo, 
     fares: fares
   }
 }
-
+const BLOCKED_RESOURCES = [
+  "*/favicon.ico", ".css", ".jpg", ".jpeg", ".png", ".svg", ".woff",
+  "*.optimizely.com", "everesttech.net", "userzoom.com", "doubleclick.net", "googleadservices.com", "adservice.google.com/*",
+  "connect.facebook.com", "connect.facebook.net", "sp.analytics.yahoo.com"]
+  
 const standardizeResults = async (rawResponse, date) => {
   const zeroPad = num => (num.toString().length === 1 ? `0${num}` : num)
     const convertTo24 = time => { const d = new Date(`1/1/2020 ${time}`); return `${zeroPad(d.getHours())}:${zeroPad(d.getMinutes())}` }
@@ -34,6 +38,8 @@ const standardizeResults = async (rawResponse, date) => {
   });
 
   const page = await context.newPage();
+  const client = await page.context().newCDPSession(page);
+  await client.send("Network.setBlockedURLs", { urls: BLOCKED_RESOURCES })
   await page.goto("https://m.alaskaair.com/shopping/?timeout=true", {waitUntil: "networkidle", timeout: 60000})
 
   await page.setContent(rawResponse)

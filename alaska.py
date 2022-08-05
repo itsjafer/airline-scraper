@@ -2,7 +2,7 @@ import json
 import requests
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 import math
 import datetime
 import re
@@ -29,7 +29,8 @@ def standardize_results(rawResponse, date):
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
-
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
         page.goto("https://m.alaskaair.com/shopping/?timeout=true", wait_until="networkidle")
         page.set_content(rawResponse)
 
@@ -116,4 +117,4 @@ def get_flights(origin, destination, date):
 
     return flights
 
-get_flights("ORD", "LGA", "2022-10-14")
+print(get_flights("LHR", "JFK", "2022-09-01"))

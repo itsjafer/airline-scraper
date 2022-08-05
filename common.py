@@ -17,6 +17,11 @@ class StandardFlight(dict):
     def __repr__(self):
         return f"{self.flightNo}: {self.origin} on {self.departureDateTime} -> {self.destination} on {self.arrivalDateTime}. Fares: {self.fares}.\n"
 
+BLOCKED_RESOURCES = [
+    "*/favicon.ico", ".css", ".jpg", ".jpeg", ".png", ".svg", ".woff",
+    "*.optimizely.com", "everesttech.net", "userzoom.com", "doubleclick.net", "googleadservices.com", "adservice.google.com/*",
+    "connect.facebook.com", "connect.facebook.net", "sp.analytics.yahoo.com"]
+
 userAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",

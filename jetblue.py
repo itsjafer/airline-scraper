@@ -2,7 +2,7 @@ import json
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync
 import time
-from common import StandardFlight, USER_AGENT, VIEWPORT
+from common import StandardFlight, USER_AGENT, VIEWPORT, BLOCKED_RESOURCES
 
 def standardize_results(rawResponse):
     results = list()
@@ -64,14 +64,15 @@ def standardize_results(rawResponse):
 
 def get_flights(origin, destination, date):
     with sync_playwright() as playwright:
-        browser = playwright.firefox.launch(
+        browser = playwright.chromium.launch(
                 headless=True
             )
         page = browser.new_page(
             user_agent=USER_AGENT,
             viewport=VIEWPORT
         )
-
+        client = page.context.new_cdp_session(page)
+        client.send("Network.setBlockedURLs", { "urls": BLOCKED_RESOURCES })
         stealth_sync(page)
 
         url = f'https://www.jetblue.com/booking/flights?from={origin}&to={destination}&depart={date}&noOfRoute=1&isMultiCity=false&lang=en&adults=1&children=0&infants=0&sharedMarket=false&roundTripFaresFlag=false&usePoints=true'
