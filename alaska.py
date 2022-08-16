@@ -116,5 +116,3 @@ def get_flights(origin, destination, date):
     flights = standardize_results(rawResponse, date)
 
     return flights
-
-print(get_flights("LHR", "JFK", "2022-09-01"))
